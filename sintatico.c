@@ -1590,6 +1590,7 @@ int isPrintStatement() {
 }
 
 void printStatement() {
+    Tipo tipo;
  #ifdef DEBUG_ALL
     printf("%sSTART PRINT_STATEMENT\n", getTabs());
     tab++;
@@ -1605,7 +1606,11 @@ void printStatement() {
  #endif
             nextLine();
             if(isTestlist()) {
-                testlist();
+                tipo = testlist();
+                if(tipo == VAZIO || tipo == NI){
+                    printf("ERRO SEMANTICO, Identificador invalido\n");
+                    exit(4);
+                }
                 nextLine();
             }
             if(isFechaParenteses()) {
@@ -1616,7 +1621,11 @@ void printStatement() {
                 ERRO
             }
         } else if(isTestlist()) {
-            testlist();
+            tipo = testlist();
+            if(tipo == VAZIO || tipo == NI){
+                printf("ERRO SEMANTICO, Identificador invalido\n");
+                exit(4);
+            }
         } else {
             ERRO
         }
