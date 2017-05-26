@@ -1411,7 +1411,11 @@ void lenStatement(){
  #endif
             nextLine();
             if(isTest()){
-                test();
+                Tipo tipo = test();
+                if(tipo != LISTA && tipo != TUPLA && tipo != LITERAL){
+                    printf("ERRO SEMANTICO, Identificador invalido\n");
+                    exit(4);
+                }
                 nextLine();
                 if(isFechaParenteses()){
  #ifdef DEBUG
@@ -1451,7 +1455,11 @@ void inputStatement() {
  #endif
             nextLine();
             if(isTest()) {
-                test();
+                Tipo tipo = test();
+                if(tipo == VAZIO || tipo == NI){
+                    printf("ERRO SEMANTICO, Identificador invalido\n");
+                    exit(4);
+                }
                 nextLine();
             }
             if(isFechaParenteses()) {
@@ -1493,7 +1501,11 @@ void rangeStatement() {
  #endif
             nextLine();
             if(isTest()) {
-                test();
+                Tipo tipo = test();
+                if(tipo == VAZIO || tipo == NI){
+                    printf("ERRO SEMANTICO, Identificador invalido\n");
+                    exit(4);
+                }
                 nextLine();
                 if(isVirgula()) {
  #ifdef DEBUG
@@ -1501,7 +1513,11 @@ void rangeStatement() {
  #endif
                     nextLine();
                     if(isTest()) {
-                        test();
+                        tipo = test();
+                        if(tipo == VAZIO || tipo == NI){
+                            printf("ERRO SEMANTICO, Identificador invalido\n");
+                            exit(4);
+                        }
                         nextLine();
                     } else {
                         ERRO
@@ -1544,7 +1560,11 @@ void execStatement() {
  #endif
         nextLine();
         if(isExpr()) {
-            expr();
+            Tipo tipo = expr();
+            if(tipo == VAZIO || tipo == NI){
+                printf("ERRO SEMANTICO, Identificador invalido\n");
+                exit(4);
+            }
             nextLine();
             if(isIn()){
  #ifdef DEBUG
