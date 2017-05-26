@@ -1,0 +1,37 @@
+########################3
+##wkgifhsrigf edgewrgfw 
+vetorList = [ 2 , 3 , 5 , 7 , 11 ]
+i = 0
+
+def abc ( a , b , c ) :
+    return a
+if a == b :
+    c = abc ( 1 , 2 , 3 )
+
+while i <  5 :
+    print ( vetorList [ i ] )
+    i = i + 1
+###############
+######################
+#exercício2 de exemplo
+
+number1 = 5
+number2 = 6
+if number1 > number2 :
+    print "ogwgwf" , number1
+
+
+if number2 > number1 :
+    print "offffff" , number2
+else :
+    print number1 , " = " , number2
+# rgesr grg arg agf
+######################
+#exercício3 de exemplo
+
+for i in range ( 50 ) :
+
+    if i % 2 == 0 :
+        print i , 'epar'
+    else :
+        print i , 'eimpar'

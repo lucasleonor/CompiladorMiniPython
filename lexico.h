@@ -1,0 +1,1110 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+#define OU else if
+#define MAX 200
+
+int onlySpace (char *Linha);
+char* scanner (char *c);
+int ver(char c, char *str);
+char aux[200]= "";
+
+char ids[MAX][MAX];
+int iids = 0;
+char idAux[MAX];
+
+int strAvaliador(char *str)
+{
+    int j;
+    for (j = 0 ; j <= iids ; j++)
+    {
+        if(!strcmp(str,ids[j]))
+            return j;
+    }
+    strcpy(ids[++iids],str);
+    return iids;
+}
+
+int lexico(char *input_file, char *output_file) {
+    int auxRepete = 0;
+    FILE *ler,*esc;
+    ler = fopen(input_file,"r");
+    esc = fopen(output_file,"w");
+    char Linha[300];
+    char token[100];
+    register i = 0;
+     char *result;
+    while (!feof(ler))
+    {
+        if (fgets(Linha, 100, ler))
+        {
+            while(Linha[0]=='#'||onlySpace(Linha)) fgets(Linha, 100, ler);
+              char *ptr=Linha;
+              while(*ptr)
+              {
+                  if(*ptr=='"'||*ptr=='\'')
+                  {
+                      i=0;
+                      token[i++]=*ptr++;
+                      while(*ptr!='"'&&*ptr!='\'')
+                      {
+                          token[i++]=*ptr++;
+                    }
+                    token[i++]=*ptr++;
+                    token[i]='\0';
+                    char *escreveTokenArquivo1 = scanner(token);
+                    int error = strcmp(escreveTokenArquivo1,"ERRO LEXICO\n");
+                    if(error != 0)
+                        fprintf(esc,"%s",escreveTokenArquivo1);
+                    else
+                    {
+                        fprintf(esc,"%s",escreveTokenArquivo1);
+                        printf("Erro Lexico em :\n\"%s\"\nProcesso finalizado.\n",token);
+                        fclose(esc);
+                        fclose(ler);
+                        return(1);
+                    }
+                    i=0;
+                }
+                  if(!(*ptr==' '||*ptr=='\t'||*ptr=='\n'))
+                  {
+                      auxRepete = 0;
+                      token[i]=*ptr;
+                      i++;
+                 }
+                  else
+                {
+                      if(auxRepete == 0)
+                    {
+                        token[i]='\0';
+                        char *escreveTokenArquivo2 = scanner(token);
+                        int error = strcmp(escreveTokenArquivo2,"ERRO LEXICO\n");
+                        if(error != 0)
+                            fprintf(esc,"%s",escreveTokenArquivo2);
+                        else
+                        {
+                            fprintf(esc,"%s",escreveTokenArquivo2);
+                            printf("Erro Lexico em :\n\"%s\"\nProcesso finalizado.\n",token);
+                            fclose(esc);
+                            fclose(ler);
+                            return(1);
+                        }
+                        strcpy(token,"");
+                        i = 0;
+                    }
+                      auxRepete += 1;
+                  }
+                  ptr++;
+            }
+          }
+    }
+    fclose(ler);
+    fclose(esc);
+    return 0;
+}
+
+//automato completo
+char* scanner(char *c)
+{
+    char *str=c;
+    q0:
+        if(*c==':') goto q9;
+        OU(*c=='!') goto q23;
+        OU(*c=='"'||*c=='\'') goto q1;
+        OU(*c=='p') goto q91;
+        OU(*c=='[') goto q104;
+        OU(*c==']') goto q105;
+        OU(*c=='w') goto q96;
+        OU(*c=='=') goto q11;
+        OU(*c=='/') goto q18;
+        OU(ver(*c,"[T-Z]")) goto q36;
+        OU(*c=='n') goto q66;
+        OU(*c=='}') goto q7;
+        OU(*c=='a') goto q4;
+        OU(*c==';') goto q12;
+        OU(*c=='.') goto q10;
+        OU(*c=='%') goto q25;
+        OU(ver(*c,"[x-z]")) goto q36;
+        OU(*c=='#') goto q47;
+        OU(*c=='d') goto q88;
+        OU(*c=='<') goto q28;
+        OU(*c=='c') goto q52;
+        OU(*c=='o') goto q50;
+        OU(*c=='f') goto q60;
+        OU(*c=='-') goto q13;
+        OU(*c=='i') goto q32;
+        OU(ver(*c,"[G-S]")) goto q36;
+        OU(*c=='T') goto q107;
+        OU(ver(*c,"[A-E]")) goto q36;
+        OU(*c=='b') goto q83;
+        OU(*c=='r') goto q69;
+        OU(*c=='F') goto q111;
+        OU(*c=='l') goto q79;
+        OU(*c=='e') goto q40;
+        OU(*c==')') goto q3;
+        OU(*c=='~') goto q27;
+        OU(*c=='m') goto q36;
+        OU(*c=='j') goto q36;
+        OU(*c=='k') goto q36;
+        OU(*c=='h') goto q36;
+        OU(*c=='g') goto q36;
+        OU(*c=='>') goto q20;
+        OU(*c=='q') goto q36;
+        OU(*c=='+') goto q14;
+        OU(ver(*c,"[0-9]")) goto q30;
+        OU(*c=='w') goto q104;
+        OU(ver(*c,"[s-v]")) goto q36;
+        OU(*c=='(') goto q2;
+        OU(*c=='*') goto q26;
+        OU(*c==',') goto q8;
+        OU(*c=='{') goto q6;
+        return "ERRO LEXICO\n";
+    q1:c++;
+        if(ver(*c,"[A-Z]")) goto q1;
+        OU(ver(*c,"[a-z]")) goto q1;
+        OU(ver(*c,"[0-9]")) goto q1;
+        OU(*c==' ') goto q1;
+        OU(*c=='"'||*c=='\'') goto q106;
+        OU(*c=='\n') return "ERRO LEXICO\n";
+        else goto q1;
+    q2:c++;
+        if(*c=='\0') return "<delimitador,abre_parenteses>\n";
+        else return "ERRO LEXICO\n";
+    q3:c++;
+        if(*c=='\0') return "<delimitador,fecha_parenteses>\n";
+        else return "ERRO LEXICO\n";
+    q4:c++;
+        if(*c=='n') goto q5;
+        OU(ver(*c,"[A-Z]")) goto q36;
+        OU(ver(*c,"[o-r]")) goto q36;
+        OU(*c=='s') goto q31;
+        OU(ver(*c,"[t-z]")) goto q36;
+        OU(ver(*c,"[a-m]")) goto q36;
+        OU(*c=='_') goto q36;
+        OU(ver(*c,"[0-9]")) goto q36;
+        OU(*c=='\0') goto q36;
+        return "ERRO LEXICO\n";
+    q5:c++;
+        if(ver(*c,"[A-Z]")) goto q36;
+        OU(*c=='d') goto q15;
+        OU(*c=='_') goto q36;
+        OU(ver(*c,"[0-9]")) goto q36;
+        OU(ver(*c,"[a-c]")) goto q36;
+        OU(ver(*c,"[e-z]")) goto q36;
+        OU(*c=='\0') goto q36;
+        return "ERRO LEXICO\n";
+    q6:c++;
+        if(*c=='\0') return "<delimitador,abre_chave>\n";
+        else return "ERRO LEXICO\n";
+    q7:c++;
+        if(*c=='\0') return "<delimitador,fecha_chave>\n";
+        else return "ERRO LEXICO\n";
+    q8:c++;
+        if(*c=='\0') return "<delimitador,virgula>\n";
+        else return "ERRO LEXICO\n";
+    q9:c++;
+        if(*c=='\0') return "<delimitador,dois_pontos>\n";
+        else return "ERRO LEXICO\n";
+    q10:c++;
+        if(*c=='\0') return "<delimitador,ponto>\n";
+        else return "ERRO LEXICO\n";
+    q11:c++;
+        if(*c=='\0') return "<delimitador,igual>\n";
+        OU(*c=='=') goto q118;
+        else return "ERRO LEXICO\n";
+    q12:c++;
+        if(*c=='\0') return "<delimitador,ponto_virgula>\n";
+        else return "ERRO LEXICO\n";
+    q13:c++;
+        if(ver(*c,"[0-9]")) goto q30;
+        OU(*c=='\0') return "<operador,menos>\n";
+        else return "ERRO LEXICO\n";
+    q14:c++;
+        if(ver(*c,"[0-9]")) goto q30;
+        OU(*c=='\0') return "<operador,mais>\n";
+        else return "ERRO LEXICO\n";
+    q15:c++;
+        if(ver(*c,"[0-9]")) goto q36;
+        OU(ver(*c,"[A-Z]")) goto q36;
+        OU(ver(*c,"[a-z]")) goto q36;
+        OU(*c=='\0') return "<reservada,and>\n";
+        else return "ERRO LEXICO\n";
+    q16:c++;
+        if(ver(*c,"[0-9]")) goto q17;
+        return "ERRO LEXICO\n";
+    q17:c++;
+        if(ver(*c,"[0-9]")) goto q17;
+        OU(*c=='\0'){
+            strcpy(aux,"<real,");
+            strcat(aux,str);
+            strcat(aux,">\n");
+            return aux;
+        }else return "ERRO LEXICO\n";
+    q18:c++;
+        if(*c=='\0') return "<operador,divisao>\n";
+        else return "ERRO LEXICO\n";
+    q19:c++;
+        if(*c=='\0') return "<operador,potencia>\n";
+        else return "ERRO LEXICO\n";
+    q20:c++;
+        if(*c=='=') goto q21;
+        OU(*c=='\0') return "<operador,maior>\n";
+        else return "ERRO LEXICO\n";
+    q21:c++;
+        if(*c=='\0') return "<operador,maior_igual>\n";
+        else return "ERRO LEXICO\n";
+    q22:c++;
+        if(*c=='\0') return "<operador,menor_igual>\n";
+        else return "ERRO LEXICO\n";
+    q23:c++;
+        if(*c=='=') goto q24;
+        return "ERRO LEXICO\n";
+    q24:c++;
+        if(*c=='\0') return "<operador,diferente>\n";
+        else return "ERRO LEXICO\n";
+    q25:c++;
+        if(*c=='\0') return "<operador,resto>\n";
+        else return "ERRO LEXICO\n";
+    q26:c++;
+        if(*c=='*') goto q19;
+        OU(*c=='\0') return "<operador,vezes>\n";
+        else return "ERRO LEXICO\n";
+    q27:c++;
+        if(*c=='\0') return "<operador,complemento>\n";
+        else return "ERRO LEXICO\n";
+    q28:c++;
+        if(*c=='=') goto q22;
+        OU(*c=='>') goto q29;
+        OU(*c=='\0') return "<operador,menor>\n";
+        else return "ERRO LEXICO\n";
+    q29:c++;
+        if(*c=='\0') return "<operador,diferente>\n";
+        else return "ERRO LEXICO\n";
+    q30:c++;
+        if(ver(*c,"[0-9]")) goto q30;
+        OU(*c=='.') goto q16;
+        OU(*c=='\0')
+        {
+            strcpy(aux,"<inteiro,");
+            strcat(aux,str);
+            strcat(aux,">\n");
+            return aux;
+        }
+        else
+        {
+            return "ERRO LEXICO\n";
+        }
+        
+    q31:c++;
+        if(ver(*c,"[a-z]")) goto q36;
+        OU(ver(*c,"[A-Z]")) goto q36;    
+        OU(ver(*c,"[0-9]")) goto q36;
+        OU(*c=='_') goto q36;
+        OU(*c=='\0') return "<reservada,as>\n";
+        else return "ERRO LEXICO\n";
+        
+    q32:c++;
+        if(ver(*c,"[0-9]")) goto q36;
+        OU(ver(*c,"[a-e]")) goto q36;
+        OU(*c=='s') goto q34;
+        OU(ver(*c,"[t-z]")) goto q36;
+        OU(*c=='f') goto q35;
+        OU(*c=='_') goto q36;
+        OU(*c=='n') goto q33;
+        OU(ver(*c,"[g-m]")) goto q36;
+        OU(ver(*c,"[A-Z]")) goto q36;
+        OU(ver(*c,"[o-r]")) goto q36;
+        OU(*c=='\0') goto q36;
+        return "ERRO LEXICO\n";
+    q33:c++;
+        if(ver(*c,"[A-Z]")) goto q36;
+        OU(*c=='p') goto q37;
+        OU(ver(*c,"[a-o]")) goto q36;
+        OU(*c=='_') goto q36;
+        OU(ver(*c,"[q-z]")) goto q36;
+        OU(ver(*c,"[0-9]")) goto q36;
+        OU(*c=='\0') return "<reservada,in>\n";
+        else return "ERRO LEXICO\n";
+        
+    q34:c++;
+        if(ver(*c,"[0-9]")) goto q36;
+        OU(*c=='_') goto q36;
+        OU(ver(*c,"[a-z]")) goto q36;
+        OU(ver(*c,"[A-Z]")) goto q36;
+        OU(*c=='\0') return "<reservada,is>\n";
+        else return "ERRO LEXICO\n";
+        
+    q35:c++;
+        if(*c=='_') goto q36;
+        OU(ver(*c,"[0-9]")) goto q36;
+        OU(ver(*c,"[A-Z]")) goto q36;
+        OU(ver(*c,"[a-z]")) goto q36;
+        OU(*c=='\0') return "<reservada,if>\n";
+        else return "ERRO LEXICO\n";
+        
+    q36:c++;
+        if(*c=='_') goto q36;
+        OU(ver(*c,"[0-9]")) goto q36;
+        OU(ver(*c,"[A-Z]")) goto q36;
+        OU(ver(*c,"[a-z]")) goto q36;
+        OU(*c=='\0')
+        {
+            strcpy(aux,"<identificador,");
+            strcpy(idAux,"");
+            sprintf(idAux, "%d", strAvaliador(str));
+            strcat(aux,idAux);
+            strcat(aux,">\n");
+            return aux;
+        }
+        else
+        {
+            return "ERRO LEXICO\n";
+        }
+        
+    q37:c++;
+        if(ver(*c,"[v-z]")) goto q36;
+        OU(ver(*c,"[a-t]")) goto q36;
+        OU(ver(*c,"[A-Z]")) goto q36;
+        OU(ver(*c,"[0-9]")) goto q36;
+        OU(*c=='u') goto q38;
+        OU(*c=='_') goto q36;
+        OU(*c=='\0') goto q36;
+        return "ERRO LEXICO\n";
+    q38:c++;
+        if(ver(*c,"[0-9]")) goto q36;
+        OU(*c=='_') goto q36;
+        OU(ver(*c,"[u-z]")) goto q36;
+        OU(ver(*c,"[a-s]")) goto q36;
+        OU(ver(*c,"[A-Z]")) goto q36;
+        OU(*c=='t') goto q39;
+        OU(*c=='\0') goto q36;
+        return "ERRO LEXICO\n";
+    q39:c++;
+        if(ver(*c,"[A-Z]")) goto q36;
+        OU(ver(*c,"[a-z]")) goto q36;
+        OU(*c=='_') goto q36;
+        OU(ver(*c,"[0-9]")) goto q36;
+        OU(*c=='\0') return "<reservada,input>\n";
+        else return "ERRO LEXICO\n";
+        
+    q40:c++;
+        if(ver(*c,"[a-k]")) goto q36;
+        OU(*c=='_') goto q36;
+        OU(*c=='y') goto q36;
+        OU(*c=='z') goto q36;
+        OU(ver(*c,"[0-9]")) goto q36;
+        OU(*c=='x') goto q44;
+        OU(ver(*c,"[A-Z]")) goto q36;
+        OU(ver(*c,"[m-w]")) goto q36;
+        OU(*c=='l') goto q41;
+        OU(*c=='\0') goto q36;
+        return "ERRO LEXICO\n";
+    q41:c++;
+        if(ver(*c,"[A-Z]")) goto q36;
+        OU(*c=='i') goto q42;
+        OU(*c=='_') goto q36;
+        OU(ver(*c,"[j-r]")) goto q36;
+        OU(*c=='s') goto q48;
+        OU(ver(*c,"[t-z]")) goto q36;
+        OU(ver(*c,"[a-h]")) goto q36;
+        OU(ver(*c,"[0-9]")) goto q36;
+        OU(*c=='\0') goto q36;
+        return "ERRO LEXICO\n";
+    q42:c++;
+        if(ver(*c,"[A-Z]")) goto q36;
+        OU(*c=='f') goto q43;
+        OU(ver(*c,"[a-e]")) goto q36;
+        OU(ver(*c,"[0-9]")) goto q36;
+        OU(*c=='_') goto q36;
+        OU(ver(*c,"[g-z]")) goto q36;
+        OU(*c=='\0') goto q36;
+        return "ERRO LEXICO\n";
+    q43:c++;
+        if(ver(*c,"[A-Z]")) goto q36;
+        OU(ver(*c,"[a-z]")) goto q36;
+        OU(*c=='_') goto q36;
+        OU(ver(*c,"[0-9]")) goto q36;
+        OU(*c=='\0') return "<reservada,elif>\n";
+        else return "ERRO LEXICO\n";
+        
+    q44:c++;
+        if(ver(*c,"[A-Z]")) goto q36;
+        OU(*c=='e') goto q45;
+        OU(*c=='_') goto q36;
+        OU(ver(*c,"[0-9]")) goto q36;
+        OU(ver(*c,"[f-z]")) goto q36;
+        OU(ver(*c,"[a-d]")) goto q36;
+        OU(*c=='\0') goto q36;
+        return "ERRO LEXICO\n";
+    q45:c++;
+        if(ver(*c,"[A-Z]")) goto q36;
+        OU(ver(*c,"[d-z]")) goto q36;
+        OU(ver(*c,"[0-9]")) goto q36;
+        OU(*c=='_') goto q36;
+        OU(*c=='c') goto q46;
+        OU(*c=='b') goto q36;
+        OU(*c=='a') goto q36;
+        OU(*c=='\0') goto q36;
+        return "ERRO LEXICO\n";
+    q46:c++;
+        if(*c=='_') goto q36;
+        OU(ver(*c,"[0-9]")) goto q36;
+        OU(ver(*c,"[A-Z]")) goto q36;
+        OU(ver(*c,"[a-z]")) goto q36;
+        OU(*c=='\0') return "<reservada,exec>\n";
+        else return "ERRO LEXICO\n";
+    q47:c++;
+        if(*c=='!') goto q47;
+        OU(*c=='#') goto q47;
+        OU(*c=='$') goto q47;
+        OU(*c=='%') goto q47;
+        OU(*c=='&') goto q47;
+        OU(*c=='(') goto q47;
+        OU(*c==')') goto q47;
+        OU(*c=='*') goto q47;
+        OU(*c=='+') goto q47;
+        OU(*c=='-') goto q47;
+        OU(*c=='/') goto q47;
+        OU(*c=='<') goto q47;
+        OU(*c=='=') goto q47;
+        OU(*c=='>') goto q47;
+        OU(ver(*c,"[0-9]")) goto q47;
+        OU(ver(*c,"[A-Z]")) goto q47;
+        OU(ver(*c,"[a-z]")) goto q47;
+        return "";
+    q48:c++;
+        if(*c=='_') goto q36;
+        OU(ver(*c,"[0-9]")) goto q36;
+        OU(ver(*c,"[f-z]")) goto q36;
+        OU(ver(*c,"[a-d]")) goto q36;
+        OU(ver(*c,"[A-Z]")) goto q36;
+        OU(*c=='e') goto q49;
+        OU(*c=='\0') goto q36;
+        return "ERRO LEXICO\n";
+    q49:c++;
+        if(ver(*c,"[a-z]")) goto q36;
+        OU(ver(*c,"[A-Z]")) goto q36;
+        OU(ver(*c,"[0-9]")) goto q36;
+        OU(*c=='_') goto q36;
+        OU(*c=='\0') return "<reservada,else>\n";
+        else return "ERRO LEXICO\n";
+    q50:c++;
+        if(ver(*c,"[0-9]")) goto q36;
+        OU(ver(*c,"[s-z]")) goto q36;
+        OU(ver(*c,"[a-q]")) goto q36;
+        OU(*c=='_') goto q36;
+        OU(*c=='r') goto q51;
+        OU(ver(*c,"[A-Z]")) goto q36;
+        OU(*c=='\0') goto q36;
+        return "ERRO LEXICO\n";
+    q51:c++;
+        if(ver(*c,"[a-z]")) goto q36;
+        OU(ver(*c,"[A-Z]")) goto q36;
+        OU(ver(*c,"[0-9]")) goto q36;
+        OU(*c=='_') goto q36;
+        OU(*c=='\0') return "<reservada,or>\n";
+        else return "ERRO LEXICO\n";
+        
+    q52:c++;
+        if(ver(*c,"[0-9]")) goto q36;
+        OU(ver(*c,"[p-z]")) goto q36;
+        OU(*c=='o') goto q53;
+        OU(*c=='_') goto q36;
+        OU(ver(*c,"[a-n]")) goto q36;
+        OU(ver(*c,"[A-Z]")) goto q36;
+        OU(*c=='\0') goto q36;
+        return "ERRO LEXICO\n";
+    q53:c++;
+        if(*c=='_') goto q36;
+        OU(ver(*c,"[a-m]")) goto q36;
+        OU(ver(*c,"[0-9]")) goto q36;
+        OU(ver(*c,"[o-z]")) goto q36;
+        OU(*c=='n') goto q54;
+        OU(ver(*c,"[A-Z]")) goto q36;
+        OU(*c=='\0') goto q36;
+        return "ERRO LEXICO\n";
+    q54:c++;
+        if(ver(*c,"[A-Z]")) goto q36;
+        OU(ver(*c,"[a-s]")) goto q36;
+        OU(ver(*c,"[u-z]")) goto q36;
+        OU(*c=='_') goto q36;
+        OU(*c=='t') goto q55;
+        OU(ver(*c,"[0-9]")) goto q36;
+        OU(*c=='\0') goto q36;
+        return "ERRO LEXICO\n";
+    q55:c++;
+        if(ver(*c,"[a-h]")) goto q36;
+        OU(ver(*c,"[0-9]")) goto q36;
+        OU(*c=='_') goto q36;
+        OU(*c=='i') goto q56;
+        OU(ver(*c,"[j-z]")) goto q36;
+        OU(ver(*c,"[A-Z]")) goto q36;
+        OU(*c=='\0') goto q36;
+        return "ERRO LEXICO\n";
+    q56:c++;
+        if(ver(*c,"[A-Z]")) goto q36;
+        OU(ver(*c,"[0-9]")) goto q36;
+        OU(ver(*c,"[o-z]")) goto q36;
+        OU(*c=='n') goto q57;
+        OU(*c=='_') goto q36;
+        OU(ver(*c,"[a-m]")) goto q36;
+        OU(*c=='\0') goto q36;
+        return "ERRO LEXICO\n";
+    q57:c++;
+        if(*c=='_') goto q36;
+        OU(*c=='u') goto q58;
+        OU(ver(*c,"[0-9]")) goto q36;
+        OU(ver(*c,"[A-Z]")) goto q36;
+        OU(ver(*c,"[a-t]")) goto q36;
+        OU(ver(*c,"[v-z]")) goto q36;
+        OU(*c=='\0') goto q36;
+        return "ERRO LEXICO\n";
+    q58:c++;
+        if(*c=='e') goto q59;
+        OU(ver(*c,"[a-d]")) goto q36;
+        OU(ver(*c,"[f-z]")) goto q36;
+        OU(ver(*c,"[0-9]")) goto q36;
+        OU(*c=='_') goto q36;
+        OU(ver(*c,"[A-Z]")) goto q36;
+        OU(*c=='\0') goto q36;
+        return "ERRO LEXICO\n";
+    q59:c++;
+        if(ver(*c,"[0-9]")) goto q36;
+        OU(*c=='_') goto q36;
+        OU(ver(*c,"[a-z]")) goto q36;
+        OU(ver(*c,"[A-Z]")) goto q36;
+        OU(*c=='\0') return "<reservada,continue>\n";
+        else return "ERRO LEXICO\n";
+        
+    q60:c++;
+        if(*c=='o') goto q64;
+        OU(ver(*c,"[0-9]")) goto q36;
+        OU(*c=='r') goto q61;
+        OU(ver(*c,"[s-z]")) goto q36;
+        OU(*c=='_') goto q36;
+        OU(ver(*c,"[a-n]")) goto q36;
+        OU(*c=='p') goto q36;
+        OU(*c=='q') goto q36;
+        OU(ver(*c,"[A-Z]")) goto q36;
+        OU(*c=='\0') goto q36;
+        return "ERRO LEXICO\n";
+    q61:c++;
+        if(*c=='_') goto q36;
+        OU(ver(*c,"[a-n]")) goto q36;
+        OU(*c=='o') goto q62;
+        OU(ver(*c,"[0-9]")) goto q36;
+        OU(ver(*c,"[p-z]")) goto q36;
+        OU(ver(*c,"[A-Z]")) goto q36;
+        OU(*c=='\0') goto q36;
+        return "ERRO LEXICO\n";
+    q62:c++;
+        if(*c=='m') goto q63;
+        OU(ver(*c,"[0-9]")) goto q36;
+        OU(ver(*c,"[a-l]")) goto q36;
+        OU(*c=='_') goto q36;
+        OU(ver(*c,"[n-z]")) goto q36;
+        OU(ver(*c,"[A-Z]")) goto q36;
+        OU(*c=='\0') goto q36;
+        return "ERRO LEXICO\n";
+    q63:c++;
+        if(ver(*c,"[0-9]")) goto q36;
+        OU(*c=='_') goto q36;
+        OU(ver(*c,"[a-z]")) goto q36;
+        OU(ver(*c,"[A-Z]")) goto q36;
+        OU(*c=='\0') return "<reservada,from>\n";
+        else return "ERRO LEXICO\n";
+        
+    q64:c++;
+        if(ver(*c,"[0-9]")) goto q36;
+        OU(ver(*c,"[s-z]")) goto q36;
+        OU(ver(*c,"[a-q]")) goto q36;
+        OU(*c=='_') goto q36;
+        OU(*c=='r') goto q65;
+        OU(ver(*c,"[A-Z]")) goto q36;
+        OU(*c=='\0') goto q36;
+        return "ERRO LEXICO\n";
+    q65:c++;
+        if(ver(*c,"[a-z]")) goto q36;
+        OU(ver(*c,"[A-Z]")) goto q36;
+        OU(ver(*c,"[0-9]")) goto q36;
+        OU(*c=='_') goto q36;
+        OU(*c=='\0') return "<reservada,for>\n";
+        else return "ERRO LEXICO\n";
+        
+    q66:c++;
+        if(ver(*c,"[A-Z]")) goto q36;
+        OU(ver(*c,"[p-z]")) goto q36;
+        OU(ver(*c,"[0-9]")) goto q36;
+        OU(ver(*c,"[a-n]")) goto q36;
+        OU(*c=='_') goto q36;
+        OU(*c=='o') goto q67;
+        OU(*c=='\0') goto q36;
+        return "ERRO LEXICO\n";
+    q67:c++;
+        if(*c=='_') goto q36;
+        OU(ver(*c,"[0-9]")) goto q36;
+        OU(*c=='t') goto q68;
+        OU(ver(*c,"[A-Z]")) goto q36;
+        OU(ver(*c,"[u-z]")) goto q36;
+        OU(ver(*c,"[a-s]")) goto q36;
+        OU(*c=='\0') goto q36;
+        return "ERRO LEXICO\n";
+    q68:c++;
+        if(ver(*c,"[0-9]")) goto q36;
+        OU(*c=='_') goto q36;
+        OU(ver(*c,"[a-z]")) goto q36;
+        OU(ver(*c,"[A-Z]")) goto q36;
+        OU(*c=='\0') return "<reservada,not>\n";
+        else return "ERRO LEXICO\n";
+        
+    q69:c++;
+        if(ver(*c,"[b-d]")) goto q36;
+        OU(ver(*c,"[0-9]")) goto q36;
+        OU(ver(*c,"[f-z]")) goto q36;
+        OU(*c=='_') goto q36;
+        OU(*c=='e') goto q70;
+        OU(*c=='a') goto q75;
+        OU(ver(*c,"[A-Z]")) goto q36;
+        OU(*c=='\0') goto q36;
+        return "ERRO LEXICO\n";
+    q70:c++;
+        if(*c=='_') goto q36;
+        OU(ver(*c,"[0-9]")) goto q36;
+        OU(*c=='t') goto q71;
+        OU(ver(*c,"[A-Z]")) goto q36;
+        OU(ver(*c,"[u-z]")) goto q36;
+        OU(ver(*c,"[a-s]")) goto q36;
+        OU(*c=='\0') goto q36;
+        return "ERRO LEXICO\n";
+    q71:c++;
+        if(ver(*c,"[0-9]")) goto q36;
+        OU(*c=='_') goto q36;
+        OU(ver(*c,"[a-t]")) goto q36;
+        OU(ver(*c,"[v-z]")) goto q36;
+        OU(*c=='u') goto q72;
+        OU(ver(*c,"[A-Z]")) goto q36;
+        OU(*c=='\0') goto q36;
+        return "ERRO LEXICO\n";
+    q72:c++;
+        if(*c=='r') goto q73;
+        OU(ver(*c,"[A-Z]")) goto q36;
+        OU(ver(*c,"[0-9]")) goto q36;
+        OU(ver(*c,"[s-z]")) goto q36;
+        OU(ver(*c,"[a-q]")) goto q36;
+        OU(*c=='_') goto q36;
+        OU(*c=='\0') goto q36;
+        return "ERRO LEXICO\n";
+    q73:c++;
+        if(ver(*c,"[A-Z]")) goto q36;
+        OU(*c=='_') goto q36;
+        OU(ver(*c,"[a-m]")) goto q36;
+        OU(ver(*c,"[0-9]")) goto q36;
+        OU(*c=='n') goto q74;
+        OU(ver(*c,"[o-z]")) goto q36;
+        OU(*c=='\0') goto q36;
+        return "ERRO LEXICO\n";
+    q74:c++;
+        if(ver(*c,"[0-9]")) goto q36;
+        OU(*c=='_') goto q36;
+        OU(ver(*c,"[a-z]")) goto q36;
+        OU(ver(*c,"[A-Z]")) goto q36;
+        OU(*c=='\0') return "<reservada,return>\n";
+        else return "ERRO LEXICO\n";
+        
+    q75:c++;
+        if(*c=='i') goto q80;
+        OU(ver(*c,"[A-Z]")) goto q36;
+        OU(ver(*c,"[0-9]")) goto q36;
+        OU(ver(*c,"[a-h]")) goto q36;
+        OU(ver(*c,"[j-m]")) goto q36;
+        OU(ver(*c,"[o-z]")) goto q36;
+        OU(*c=='n') goto q76;
+        OU(*c=='_') goto q36;
+        OU(*c=='\0') goto q36;
+        return "ERRO LEXICO\n";
+    q76:c++;
+        if(ver(*c,"[h-z]")) goto q36;
+        OU(*c=='_') goto q36;
+        OU(ver(*c,"[0-9]")) goto q36;
+        OU(*c=='g') goto q77;
+        OU(ver(*c,"[a-f]")) goto q36;
+        OU(ver(*c,"[A-Z]")) goto q36;
+        OU(*c=='\0') goto q36;
+        return "ERRO LEXICO\n";
+    q77:c++;
+        if(ver(*c,"[a-d]")) goto q36;
+        OU(ver(*c,"[f-z]")) goto q36;
+        OU(ver(*c,"[0-9]")) goto q36;
+        OU(*c=='_') goto q36;
+        OU(ver(*c,"[A-Z]")) goto q36;
+        OU(*c=='e') goto q78;
+        OU(*c=='\0') goto q36;
+        return "ERRO LEXICO\n";
+    q78:c++;
+        if(ver(*c,"[A-Z]")) goto q36;
+        OU(ver(*c,"[a-z]")) goto q36;
+        OU(*c=='_') goto q36;
+        OU(ver(*c,"[0-9]")) goto q36;
+        OU(*c=='\0') return "<reservada,range>\n";
+        else return "ERRO LEXICO\n";
+        
+    q79:c++;
+        if(ver(*c,"[a-d]")) goto q36;
+        OU(ver(*c,"[f-z]")) goto q36;
+        OU(ver(*c,"[0-9]")) goto q36;
+        OU(*c=='_') goto q36;
+        OU(ver(*c,"[A-Z]")) goto q36;
+        OU(*c=='e') goto q116;
+        OU(*c=='\0') goto q36;
+        return "ERRO LEXICO\n";
+    q80:c++;
+        if(ver(*c,"[A-Z]")) goto q36;
+        OU(*c=='s') goto q81;
+        OU(ver(*c,"[t-z]")) goto q36;
+        OU(ver(*c,"[a-r]")) goto q36;
+        OU(*c=='_') goto q36;
+        OU(ver(*c,"[0-9]")) goto q36;
+        OU(*c=='\0') goto q36;
+        return "ERRO LEXICO\n";
+    q81:c++;
+        if(ver(*c,"[A-Z]")) goto q36;
+        OU(ver(*c,"[a-d]")) goto q36;
+        OU(*c=='e') goto q82;
+        OU(ver(*c,"[0-9]")) goto q36;
+        OU(ver(*c,"[f-z]")) goto q36;
+        OU(*c=='_') goto q36;
+        OU(*c=='\0') goto q36;
+        return "ERRO LEXICO\n";
+    q82:c++;
+        if(ver(*c,"[0-9]")) goto q36;
+        OU(*c=='_') goto q36;
+        OU(ver(*c,"[a-z]")) goto q36;
+        OU(ver(*c,"[A-Z]")) goto q36;
+        OU(*c=='\0') return "<reservada,raise>\n";
+        else return "ERRO LEXICO\n";
+        
+    q83:c++;
+        if(ver(*c,"[0-9]")) goto q36;
+        OU(*c=='r') goto q84;
+        OU(ver(*c,"[a-q]")) goto q36;
+        OU(ver(*c,"[s-z]")) goto q36;
+        OU(*c=='_') goto q36;
+        OU(ver(*c,"[A-Z]")) goto q36;
+        OU(*c=='\0') goto q36;
+        return "ERRO LEXICO\n";
+    q84:c++;
+        if(ver(*c,"[a-d]")) goto q36;
+        OU(ver(*c,"[0-9]")) goto q36;
+        OU(ver(*c,"[f-z]")) goto q36;
+        OU(*c=='_') goto q36;
+        OU(*c=='e') goto q85;
+        OU(ver(*c,"[A-Z]")) goto q36;
+        OU(*c=='\0') goto q36;
+        return "ERRO LEXICO\n";
+    q85:c++;
+        if(ver(*c,"[b-z]")) goto q36;
+        OU(ver(*c,"[A-Z]")) goto q36;
+        OU(ver(*c,"[0-9]")) goto q36;
+        OU(*c=='a') goto q86;
+        OU(*c=='_') goto q36;
+        OU(*c=='\0') goto q36;
+        return "ERRO LEXICO\n";
+    q86:c++;
+        if(ver(*c,"[0-9]")) goto q36;
+        OU(ver(*c,"[a-j]")) goto q36;
+        OU(*c=='_') goto q36;
+        OU(ver(*c,"[l-z]")) goto q36;
+        OU(ver(*c,"[A-Z]")) goto q36;
+        OU(*c=='k') goto q87;
+        OU(*c=='\0') goto q36;
+        return "ERRO LEXICO\n";
+    q87:c++;
+        if(ver(*c,"[A-Z]")) goto q36;
+        OU(ver(*c,"[a-z]")) goto q36;
+        OU(*c=='_') goto q36;
+        OU(ver(*c,"[0-9]")) goto q36;
+        OU(*c=='\0') return "<reservada,break>\n";
+        else return "ERRO LEXICO\n";
+        
+    q88:c++;
+        if(ver(*c,"[A-Z]")) goto q36;
+        OU(*c=='_') goto q36;
+        OU(*c=='e') goto q89;
+        OU(ver(*c,"[a-d]")) goto q36;
+        OU(ver(*c,"[f-z]")) goto q36;
+        OU(ver(*c,"[0-9]")) goto q36;
+        OU(*c=='\0') goto q36;
+        return "ERRO LEXICO\n";
+    q89:c++;
+        if(ver(*c,"[g-z]")) goto q36;
+        OU(*c=='_') goto q36;
+        OU(ver(*c,"[0-9]")) goto q36;
+        OU(ver(*c,"[a-e]")) goto q36;
+        OU(*c=='f') goto q90;
+        OU(ver(*c,"[A-Z]")) goto q36;
+        OU(*c=='\0') goto q36;
+        return "ERRO LEXICO\n";
+    q90:c++;
+        if(ver(*c,"[A-Z]")) goto q36;
+        OU(ver(*c,"[a-z]")) goto q36;
+        OU(*c=='_') goto q36;
+        OU(ver(*c,"[0-9]")) goto q36;
+        OU(*c=='\0') return "<reservada,def>\n";    
+        else return "ERRO LEXICO\n";
+        
+    q91:c++;
+        if(ver(*c,"[A-Z]")) goto q36;
+        OU(ver(*c,"[0-9]")) goto q36;
+        OU(ver(*c,"[a-q]")) goto q36;
+        OU(ver(*c,"[s-z]")) goto q36;
+        OU(*c=='_') goto q36;
+        OU(*c=='r') goto q92;
+        OU(*c=='\0') goto q36;
+        return "ERRO LEXICO\n";
+    q92:c++;
+        if(*c=='_') goto q36;
+        OU(*c=='i') goto q93;
+        OU(ver(*c,"[0-9]")) goto q36;
+        OU(ver(*c,"[a-h]")) goto q36;
+        OU(ver(*c,"[A-Z]")) goto q36;
+        OU(ver(*c,"[j-z]")) goto q36;
+        OU(*c=='\0') goto q36;
+        return "ERRO LEXICO\n";
+    q93:c++;
+        if(ver(*c,"[a-m]")) goto q36;
+        OU(*c=='_') goto q36;
+        OU(ver(*c,"[0-9]")) goto q36;
+        OU(ver(*c,"[o-z]")) goto q36;
+        OU(*c=='n') goto q94;
+        OU(ver(*c,"[A-Z]")) goto q36;
+        OU(*c=='\0') goto q36;
+        return "ERRO LEXICO\n";
+    q94:c++;
+        if(*c=='t') goto q95;
+        OU(ver(*c,"[A-Z]")) goto q36;
+        OU(ver(*c,"[a-s]")) goto q36;
+        OU(ver(*c,"[u-z]")) goto q36;
+        OU(*c=='_') goto q36;
+        OU(ver(*c,"[0-9]")) goto q36;
+        OU(*c=='\0') goto q36;
+        return "ERRO LEXICO\n";
+    q95:c++;
+        if(ver(*c,"[A-Z]")) goto q36;
+        OU(ver(*c,"[a-z]")) goto q36;
+        OU(*c=='_') goto q36;
+        OU(ver(*c,"[0-9]")) goto q36;
+        OU(*c=='\0') return "<reservada,print>\n";
+        else return "ERRO LEXICO\n";
+        
+    q96:c++;
+        if(ver(*c,"[j-z]")) goto q36;
+        OU(ver(*c,"[A-Z]")) goto q36;
+        OU(ver(*c,"[0-9]")) goto q36;
+        OU(ver(*c,"[a-g]")) goto q36;
+        OU(*c=='i') goto q101;
+        OU(*c=='h') goto q97;
+        OU(*c=='_') goto q36;
+        OU(*c=='\0') goto q36;
+        return "ERRO LEXICO\n";
+    q97:c++;
+        if(*c=='_') goto q36;
+        OU(ver(*c,"[a-h]")) goto q36;
+        OU(ver(*c,"[0-9]")) goto q36;
+        OU(ver(*c,"[A-Z]")) goto q36;
+        OU(*c=='i') goto q98;
+        OU(ver(*c,"[j-z]")) goto q36;
+        OU(*c=='\0') goto q36;
+        return "ERRO LEXICO\n";
+    q98:c++;
+        if(ver(*c,"[m-z]")) goto q36;
+        OU(ver(*c,"[A-Z]")) goto q36;
+        OU(*c=='_') goto q36;
+        OU(ver(*c,"[a-k]")) goto q36;
+        OU(*c=='l') goto q99;
+        OU(ver(*c,"[0-9]")) goto q36;
+        OU(*c=='\0') goto q36;
+        return "ERRO LEXICO\n";
+    q99:c++;
+        if(*c=='_') goto q36;
+        OU(ver(*c,"[f-z]")) goto q36;
+        OU(ver(*c,"[0-9]")) goto q36;
+        OU(ver(*c,"[a-d]")) goto q36;
+        OU(ver(*c,"[A-Z]")) goto q36;
+        OU(*c=='e') goto q100;
+        OU(*c=='\0') goto q36;
+        return "ERRO LEXICO\n";
+    q100:c++;
+        if(ver(*c,"[a-z]")) goto q36;
+        OU(ver(*c,"[A-Z]")) goto q36;
+        OU(ver(*c,"[0-9]")) goto q36;
+        OU(*c=='_') goto q36;
+        OU(*c=='\0') return "<reservada,while>\n";
+        else return "ERRO LEXICO\n";
+        
+    q101:c++;
+        if(*c=='_') goto q36;
+        OU(ver(*c,"[0-9]")) goto q36;
+        OU(ver(*c,"[A-Z]")) goto q36;
+        OU(ver(*c,"[u-z]")) goto q36;
+        OU(ver(*c,"[a-s]")) goto q36;
+        OU(*c=='t') goto q102;
+        OU(*c=='\0') goto q36;
+        return "ERRO LEXICO\n";
+    q102:c++;
+        if(ver(*c,"[A-Z]")) goto q36;
+        OU(*c=='h') goto q103;
+        OU(ver(*c,"[0-9]")) goto q36;
+        OU(ver(*c,"[a-g]")) goto q36;
+        OU(*c=='_') goto q36;
+        OU(ver(*c,"[i-z]")) goto q36;
+        OU(*c=='\0') goto q36;
+        return "ERRO LEXICO\n";
+    q103:c++;
+        if(ver(*c,"[0-9]")) goto q36;
+        OU(*c=='_') goto q36;
+        OU(ver(*c,"[a-z]")) goto q36;
+        OU(ver(*c,"[A-Z]")) goto q36;
+        OU(*c=='\0') return "<reservada,with>\n";
+        else return "ERRO LEXICO\n";
+        
+    q104:c++;
+        if(*c=='\0') return "<delimitador,abre_colchete>\n";
+        else return "ERRO LEXICO\n";
+    q105:c++;
+        if(*c=='\0') return "<delimitador,fecha_colchete>\n";
+        else return "ERRO LEXICO\n";
+    q106:c++;
+        //if(*c=='\0')
+        //{
+            strcpy(aux,"<cadeia_caracteres,");
+            strcat(aux,str);
+            strcat(aux,">\n");
+            return aux;
+        //}//
+        //else return "ERRO LEXICO\n";
+    q107:c++;
+        if(ver(*c,"[0-9]")) goto q36;
+        OU(ver(*c,"[a-q]")) goto q36;
+        OU(ver(*c,"[s-z]")) goto q36;
+        OU(*c=='_') goto q36;
+        OU(*c=='r') goto q108;
+        OU(ver(*c,"[A-Z]")) goto q36;
+        OU(*c=='\0') goto q36;
+        return "ERRO LEXICO\n";
+    q108:c++;
+        if(ver(*c,"[v-z]")) goto q36;
+        OU(ver(*c,"[a-t]")) goto q36;
+        OU(*c=='u') goto q109;
+        OU(ver(*c,"[A-Z]")) goto q36;
+        OU(ver(*c,"[0-9]")) goto q36;
+        OU(*c=='_') goto q36;
+        OU(*c=='\0') goto q36;
+        return "ERRO LEXICO\n";
+    q109:c++;
+        if(ver(*c,"[A-Z]")) goto q36;
+        OU(*c=='_') goto q36;
+        OU(ver(*c,"[0-9]")) goto q36;
+        OU(*c=='e') goto q110;
+        OU(ver(*c,"[f-z]")) goto q36;
+        OU(ver(*c,"[a-d]")) goto q36;
+        
+        OU(*c=='\0') goto q36;
+        return "ERRO LEXICO\n";
+    q110:c++;
+        if(ver(*c,"[0-9]")) goto q36;
+        OU(*c=='_') goto q36;
+        OU(ver(*c,"[a-z]")) goto q36;
+        OU(ver(*c,"[A-Z]")) goto q36;
+        OU(*c=='\0') return "<reservada,True>\n";
+        else return "ERRO LEXICO\n";
+    q111:c++;
+        if(ver(*c,"[0-9]")) goto q36;
+        OU(*c=='_') goto q36;
+        OU(ver(*c,"[A-Z]")) goto q36;
+        OU(ver(*c,"[b-z]")) goto q36;
+        OU(*c=='a') goto q112;
+        OU(*c=='\0') goto q36;
+        return "ERRO LEXICO\n";
+    q112:c++;
+        if(ver(*c,"[m-z]")) goto q36;
+        OU(ver(*c,"[A-Z]")) goto q36;
+        OU(*c=='l') goto q113;
+        OU(*c=='_') goto q36;
+        OU(ver(*c,"[a-k]")) goto q36;
+        OU(ver(*c,"[0-9]")) goto q36;
+        OU(*c=='\0') goto q36;
+        return "ERRO LEXICO\n";
+    q113:c++;
+        if(ver(*c,"[t-z]")) goto q36;
+        OU(ver(*c,"[a-r]")) goto q36;
+        OU(*c=='_') goto q36;
+        OU(ver(*c,"[0-9]")) goto q36;
+        OU(ver(*c,"[A-Z]")) goto q36;
+        OU(*c=='s') goto q114;
+        OU(*c=='\0') goto q36;
+        return "ERRO LEXICO\n";
+    q114:c++;
+        if(ver(*c,"[A-Z]")) goto q36;
+        OU(ver(*c,"[a-d]")) goto q36;
+        OU(ver(*c,"[0-9]")) goto q36;
+        OU(ver(*c,"[f-z]")) goto q36;
+        OU(*c=='_') goto q36;
+        OU(*c=='e') goto q115;
+        OU(*c=='\0') goto q36;
+        return "ERRO LEXICO\n";
+    q115:c++;
+        if(*c=='_') goto q36;
+        OU(ver(*c,"[0-9]")) goto q36;
+        OU(ver(*c,"[A-Z]")) goto q36;
+        OU(ver(*c,"[a-z]")) goto q36;
+        OU(*c=='\0') return "<reservada,False>\n";
+        else return "ERRO LEXICO\n";
+    q116:c++;
+        if(*c=='n') goto q117;
+        OU(ver(*c,"[A-Z]")) goto q36;
+        OU(*c=='_') goto q36;
+        OU(ver(*c,"[a-m]")) goto q36;
+        OU(ver(*c,"[0-9]")) goto q36;
+        OU(ver(*c,"[o-z]")) goto q36;
+        OU(*c=='\0') goto q36;
+        return "ERRO LEXICO\n";
+    q117:c++;
+        if(ver(*c,"[A-Z]")) goto q36;
+        OU(ver(*c,"[a-z]")) goto q36;
+        OU(*c=='_') goto q36;
+        OU(ver(*c,"[0-9]")) goto q36;
+        OU(*c=='\0') return "<reservada,len>\n";
+        else return "ERRO LEXICO\n";
+    q118:c++;
+        if(*c=='\0') return "<operador,compara_igual>\n";
+        else return "ERRO LEXICO\n";
+    q119:c++;
+        return "ERRO LEXICO\n";
+}
+
+//verifica se o character "c" pertence ao intervalo "[a-b]" utilizando tabela ascii (0-255)
+int ver(char c,char *str)
+{
+    char *ptr=str;
+    ptr++;
+    char a = *ptr;
+    ptr++;
+    ptr++;
+    char b = *ptr;
+    if(c>=a&&c<=b)
+        return 1;
+    return 0;
+}
+
+//verifica se a Linha do "MiniPython" não possui informação, ou seja, apenas espaço ou nova linha ou tabulacao
+int onlySpace(char *Linha)
+{
+    while(*Linha)
+    {
+        if(*Linha!=' '||*Linha!='\n'||*Linha!='\t')
+            return 0;
+        Linha++;
+    }
+    return 1;
+}

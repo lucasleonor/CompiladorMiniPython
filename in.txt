@@ -1,0 +1,7 @@
+number1 = 4 , 2 , 3 , 5 ,
+number2 = number1 [ 3 ] + 4
+
+if number1 > number2 :
+	print i , 'epar'
+else :
+    print i , 'epar'

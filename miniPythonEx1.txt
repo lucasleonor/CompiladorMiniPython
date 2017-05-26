@@ -1,0 +1,32 @@
+########################3
+##wkgifhsrigf edgewrgfw 
+vetorList = [ 2 , 3 , 5 , 7 , 11 ]
+i = 0
+
+while i < len ( vetorList ) :
+    print ( vetorList [ i ] )
+    i = i + 1
+###############
+######################
+#exercício2 de exemplo
+
+number1 = input ( "digiteumnumero" )
+number2 = input ( "digiteoutronumer" )
+if number1 > number2 :
+    print "ogwgwf" , number1
+
+
+if number2 > number1 :
+    print "offffff" , number2
+else :
+    print number1 , " = " , number2
+# rgesr grg arg agf
+######################
+#exercício3 de exemplo
+
+for i in range ( 50 ) :
+    raise i , a
+    if i % 2 == 0 :
+        print i , 'epar'
+    else :
+        print i , 'eimpar'
